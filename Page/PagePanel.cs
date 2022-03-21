@@ -47,10 +47,6 @@ namespace PDF_Process
         #region 初始
         public PagePanel()
         {
-            //InitializeBaseGrid();
-            //InitializePanelDataPanel();
-            //InitializePanelScrollViewer();
-            //InitializeButtonEnter();
             var a =new  PDFProcess();
           
         }
