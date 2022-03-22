@@ -1,13 +1,11 @@
-﻿using Microsoft.Win32;
-using System;
-using System.IO;
+﻿
 using System.Windows;
 using System.Windows.Controls;
 
 
 namespace PDF_Process
 {
-    public class ItemData : System.Windows.Controls.UserControl
+    public class ItemData :UserControl
     {
         #region 屬性
 
@@ -17,30 +15,30 @@ namespace PDF_Process
             set;
         }
 
-        public System.Windows.Controls.CheckBox DataCheckBox
+        public CheckBox DataCheckBox
         {
             get;
             set;
         }
 
-        public System.Windows.Controls.TextBox PillarName
+        public TextBox PillarName
         {
             get;
             set;
         }
 
-        public System.Windows.Controls.TextBox PillarData
+        public TextBox PillarData
         {
             get;
             set;
         }
 
-        public System.Windows.Controls.TextBox FileOrgin
+        public TextBox FileOrgin
         {
             get;
             set;
         }
-        public System.Windows.Controls.Button FileButton
+        public Button FileButton
         {
             get;
             set;
@@ -53,7 +51,7 @@ namespace PDF_Process
 
         public ItemData(string name)
         {
-            this.Name = name;
+            this.Name = "ItemData"+ name;
             InitializedPanel();
             InitializedItem();
             InitializedPanelContent();
@@ -64,8 +62,10 @@ namespace PDF_Process
         public void InitializedPanel()
         {
             PillarPaenl = new StackPanel();
-            PillarPaenl.Orientation = System.Windows.Controls.Orientation.Horizontal;
-            PillarPaenl.Margin = new Thickness(10);
+            PillarPaenl.Orientation = Orientation.Horizontal;
+            PillarPaenl.HorizontalAlignment = HorizontalAlignment.Left;
+            PillarPaenl.VerticalAlignment = VerticalAlignment.Center;
+            PillarPaenl.Margin = new Thickness(5,2,5,2);
             this.Content = PillarPaenl;
         }
 
@@ -73,28 +73,19 @@ namespace PDF_Process
         {
             DataCheckBox = DefaultItem.CreateCheckBox("ItemAllow");
             PillarName = DefaultItem.CreateTextBox("PillarName");
-            PillarData = DefaultItem.CreateTextBox("PillarData");
-            FileOrgin = DefaultItem.CreateTextBox("FileOrgin");
-            FileButton = DefaultItem.CreatButton("FileButton","Open");
+            PillarData = DefaultItem.CreateTextBox("PillarPage");
+         
         }
 
 
         public void InitializedPanelContent()
         {
 
-                PillarPaenl.Children.Add(DataCheckBox);
-                PillarPaenl.Children.Add(PillarName);
-                PillarPaenl.Children.Add(PillarData);
-                PillarPaenl.Children.Add(FileOrgin);
-                PillarPaenl.Children.Add(FileButton);
-
-                PillarName.SetBinding(IsEnabledProperty, new System.Windows.Data.Binding("IsChecked") { Source = DataCheckBox });
-                PillarData.SetBinding(IsEnabledProperty, new System.Windows.Data.Binding("IsChecked") { Source = DataCheckBox });
-                FileOrgin.SetBinding(IsEnabledProperty, new System.Windows.Data.Binding("IsChecked") { Source = DataCheckBox });
-                FileButton.SetBinding(IsEnabledProperty, new System.Windows.Data.Binding("IsChecked") { Source = DataCheckBox });
-                FileButton.Click += FileButton_Click;
-
-   
+            PillarPaenl.Children.Add(DataCheckBox);
+            PillarPaenl.Children.Add(PillarName);
+            PillarPaenl.Children.Add(PillarData);
+            PillarName.SetBinding(IsEnabledProperty, new System.Windows.Data.Binding("IsChecked") { Source = DataCheckBox });
+            PillarData.SetBinding(IsEnabledProperty, new System.Windows.Data.Binding("IsChecked") { Source = DataCheckBox });
         }
 
 
@@ -109,11 +100,6 @@ namespace PDF_Process
 
         #region 事件
 
-        private void FileButton_Click(object sender, RoutedEventArgs e)
-        {
-
-   
-        }
 
 
         #endregion  事件

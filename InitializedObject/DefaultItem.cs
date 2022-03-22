@@ -33,6 +33,7 @@ namespace PDF_Process
         {
             CheckBox checkBox = new CheckBox();
             checkBox.FontSize = DefaultFontSize;
+            checkBox.VerticalAlignment = VerticalAlignment.Center;
             checkBox.Name = name;
             checkBox.Margin = new Thickness(10);
             checkBox.IsChecked = false;
