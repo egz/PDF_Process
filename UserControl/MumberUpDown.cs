@@ -28,6 +28,7 @@ namespace PDF_Process
             set;
         }
 
+
         private Label LabelName
         {
             get;
@@ -74,7 +75,11 @@ namespace PDF_Process
 
         #endregion 初始
 
+
         #region 函式
+
+     
+
         #endregion 函式
 
         #region 參數
@@ -139,13 +144,16 @@ namespace PDF_Process
 
             if (button.Name== "Up")
             {
+                if (NumberText.Text == "10") return;
                 NumberText.Text = (Convert.ToInt32(NumberText.Text) + 1).ToString();
             }
             else if (button.Name == "Down")
             {
+                if (NumberText.Text == "0") return;
                 NumberText.Text = (Convert.ToInt32(NumberText.Text) - 1).ToString();
 
             }
+          
 
         }
 

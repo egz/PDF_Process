@@ -44,23 +44,23 @@ namespace PDF_Process
         #endregion 屬性
 
         #region 初始
-        public PDFProcess(string originFile,string outFile,string pages)
-        {
-            OriginFilePath = originFile;
-            OutFilePath = outFile;
-            PageRang = pages;
+        //public PDFProcess(string originFile,string outFile,string pages)
+        //{
+        //    OriginFilePath = originFile;
+        //    OutFilePath = outFile;
+        //    PageRang = pages;
 
-            // 測試 //
-            PageRang = "1,2,3,10-20,7-8,9,10,11-12";
-            OriginFilePath = @"d:\test.pdf";
-            OutFilePath = @"d:\test1.pdf";
-            var tasks = new Task[3];
-            Task taskA = Task.Run(() => PdfCopyTo(OriginFilePath, OutFilePath, GetPages(PageRang)));
-            //      PdfCopyTo(originfile, outfile, GetPages(str));
-            tasks[0] = taskA;
-            Task.WaitAll(tasks);
+        //    // 測試 //
+        //    //PageRang = "1,2,3,10-20,7-8,9,10,11-12";
+        //    //OriginFilePath = @"d:\test.pdf";
+        //    //OutFilePath = @"d:\test1.pdf";
+        //    var tasks = new Task[3];
+        //    Task taskA = Task.Run(() => PdfCopyTo(OriginFilePath, OutFilePath, GetPages(PageRang)));
+        //    //      PdfCopyTo(originfile, outfile, GetPages(str));
+        //    tasks[0] = taskA;
+        //    Task.WaitAll(tasks);
 
-        }
+        //}
 
 
         public PDFProcess(Dictionary<string,object>datas)
@@ -74,8 +74,6 @@ namespace PDF_Process
             PdfCopyTo(items);
         }
 
-
-
         #endregion 初始
 
         #region 函式
@@ -88,22 +86,23 @@ namespace PDF_Process
         private void PdfCopyTo(Dictionary<string, string> items)
         {
             PdfDocument srcDoc = new PdfDocument(new PdfReader(OriginFilePath));
-
+            var tasks = new List<Task>();
             foreach (KeyValuePair<string, string> dist in items)
             {
-                string outfile = FilePath + dist.Key + ".pdf";
-                PdfDocument pdfDoc = new PdfDocument(new PdfWriter(outfile));
-               List< int> pages = GetPages(dist.Value);
+                tasks.Add(Task.Run(() =>
+                {
+                    string outfile = FilePath + dist.Key + ".pdf";
+                    PdfDocument pdfDoc = new PdfDocument(new PdfWriter(outfile));
+                    List<int> pages = GetPages(dist.Value);
 
-
-                srcDoc.CopyPagesTo(pages, pdfDoc);
-                pdfDoc.Close();
+                    srcDoc.CopyPagesTo(pages, pdfDoc);
+                    pdfDoc.Close();
+                }));
             }
-
+            Task.WaitAll(tasks.ToArray());
             srcDoc.Close();
 
         }
-
 
         /// <summary> </summary>
         /// <param name="orginFile"> 來源檔案</param>
@@ -186,19 +185,4 @@ namespace PDF_Process
 
     }
 
-  
-
-    public class ImprovedSplitter : PdfSplitter
-    {
-        private Func<PageRange, PdfWriter> nextWriter;
-        public ImprovedSplitter(PdfDocument pdfDocument, Func<PageRange, PdfWriter> nextWriter) : base(pdfDocument)
-        {
-            this.nextWriter = nextWriter;
-        }
-
-        protected override PdfWriter GetNextPdfWriter(PageRange documentPageRange)
-        {
-            return nextWriter.Invoke(documentPageRange);
-        }
-    }
 }

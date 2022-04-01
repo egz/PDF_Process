@@ -1,0 +1,17 @@
+1.使用itext7
+
+
+2022/04/01 
+  1.新增左下角可以變動欄位數量
+  2.呼叫pdf copy時，使用task，還沒測，最後task.waitall()
+  3.分支都使用task.waitall()
+
+
+
+
+
+
+待補功能：
+1.load text
+2.頁數輸出到txt
+3.存檔資料夾方式修改
