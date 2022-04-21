@@ -62,11 +62,14 @@ namespace PDF_Process
 
         private void InitializedContent()
         {
+            ScrollViewer scrollViewer = new ScrollViewer();
+
             ContentPanel = new StackPanel();
             ContentPanel.Name = "GroupContent";
             ContentPanel.Orientation = Orientation.Vertical;
-          
-            this.Content = ContentPanel;
+            scrollViewer.Content = ContentPanel;
+            scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+            this.Content = scrollViewer;
         }
 
         #endregion 初始

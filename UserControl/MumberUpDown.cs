@@ -144,7 +144,7 @@ namespace PDF_Process
 
             if (button.Name== "Up")
             {
-                if (NumberText.Text == "10") return;
+               // if (NumberText.Text == "10") return;
                 NumberText.Text = (Convert.ToInt32(NumberText.Text) + 1).ToString();
             }
             else if (button.Name == "Down")

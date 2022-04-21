@@ -86,20 +86,20 @@ namespace PDF_Process
         private void PdfCopyTo(Dictionary<string, string> items)
         {
             PdfDocument srcDoc = new PdfDocument(new PdfReader(OriginFilePath));
-            var tasks = new List<Task>();
+         //   var tasks = new List<Task>();
             foreach (KeyValuePair<string, string> dist in items)
             {
-                tasks.Add(Task.Run(() =>
-                {
+              //  tasks.Add(Task.Run(() =>
+              //  {
                     string outfile = FilePath + dist.Key + ".pdf";
                     PdfDocument pdfDoc = new PdfDocument(new PdfWriter(outfile));
                     List<int> pages = GetPages(dist.Value);
 
                     srcDoc.CopyPagesTo(pages, pdfDoc);
                     pdfDoc.Close();
-                }));
+             //   }));
             }
-            Task.WaitAll(tasks.ToArray());
+          //  Task.WaitAll(tasks.ToArray());
             srcDoc.Close();
 
         }

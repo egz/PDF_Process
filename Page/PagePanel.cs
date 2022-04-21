@@ -178,7 +178,7 @@ namespace PDF_Process
             {
                 string filename = items.PillarName.Text;
                 string pages = items.PillarData.Text;
-                if (items.DataCheckBox.IsChecked != true) break;
+                if (items.DataCheckBox.IsChecked != true) continue;
                 if (!string.IsNullOrEmpty(filename) || !string.IsNullOrEmpty(pages))
                     dist.Add(filename, pages);
             }
@@ -235,15 +235,16 @@ namespace PDF_Process
                 {
                     for (int i = 1; i <= remove; i++)
                     {
-                        Task.Run(() =>
-                        {
-                            page.ContentPanel.Children.Add(new ItemData((count + i).ToString()));
-                        });
+                        page.ContentPanel.Children.Add(new ItemData((count + i).ToString()));
+                        //Task.Run(() =>
+                        //{
+                        
+                        //});
                     }
                 }
                 else if (remove < 0)
                 {
-                    int index = page.ContentPanel.Children.Count - 1 + remove;
+                    int index = page.ContentPanel.Children.Count  + remove;
                     page.ContentPanel.Children.RemoveRange(index, Math.Abs(remove));
                 }
             }
