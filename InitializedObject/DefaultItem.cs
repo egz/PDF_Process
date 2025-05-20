@@ -35,8 +35,9 @@ namespace PDF_Process
             checkBox.FontSize = DefaultFontSize;
             checkBox.VerticalAlignment = VerticalAlignment.Center;
             checkBox.Name = name;
+            checkBox.IsChecked = true;
             checkBox.Margin = new Thickness(10);
-            checkBox.IsChecked = false;
+           
          
             return checkBox;
         }
@@ -48,7 +49,7 @@ namespace PDF_Process
             button.Name = name;
             button.Content = text;
             button.Margin = new Thickness(10);
-            button.IsEnabled = false;
+            button.IsEnabled = true;
             button.Width = 100;
             button.Height = 30;
             return button;

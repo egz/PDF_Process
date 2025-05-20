@@ -5,7 +5,7 @@ using System.Windows.Controls;
 
 namespace PDF_Process
 {
-    public class ItemData :UserControl
+    public class ItemData_New :UserControl
     {
         #region 屬性
 
@@ -34,18 +34,13 @@ namespace PDF_Process
             set;
         }
 
-        public TextBox OffsetNumber
-        {
-            get;
-            set;
-        }
 
         #endregion 屬性
 
 
         #region 初始
 
-        public ItemData(string name)
+        public ItemData_New(string name)
         {
             this.Name = "ItemData"+ name;
             InitializedPanel();
@@ -70,7 +65,6 @@ namespace PDF_Process
             DataCheckBox = DefaultItem.CreateCheckBox("ItemAllow");
             PillarName = DefaultItem.CreateTextBox("PillarName");
             PillarData = DefaultItem.CreateTextBox("PillarPage");
-            OffsetNumber = DefaultItem.CreateTextBox("OffsetNumber");
         }
 
 
@@ -80,6 +74,7 @@ namespace PDF_Process
             PillarPaenl.Children.Add(DataCheckBox);
             PillarPaenl.Children.Add(PillarName);
             PillarPaenl.Children.Add(PillarData);
+
             PillarName.SetBinding(IsEnabledProperty, new System.Windows.Data.Binding("IsChecked") { Source = DataCheckBox });
             PillarData.SetBinding(IsEnabledProperty, new System.Windows.Data.Binding("IsChecked") { Source = DataCheckBox });
         }

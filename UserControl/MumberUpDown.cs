@@ -99,20 +99,22 @@ namespace PDF_Process
 
         private TextBox InserTextBox(string name, string txt)
         {
-            TextBox TextBox = new TextBox();
-            TextBox.Name = name;
-            TextBox.Text = txt;
-            TextBox.Margin = new Thickness(2);
-            TextBox.Height = 20;
-            TextBox.Width = 20;
-            TextBox.PreviewKeyUp += TextBox_PreviewKeyUp;
-            return TextBox;
+            TextBox textBox = new TextBox();
+            textBox.Name = name;
+            textBox.Text = txt;
+            textBox.Margin = new Thickness(2);
+         
+            textBox.Height = 20;
+            textBox.Width = 20;
+            textBox.PreviewKeyUp += TextBox_PreviewKeyUp;
+            return textBox;
 
         }
 
         private Label InserLabel(string name, string txt)
         {
             Label label = new Label();
+            label.VerticalContentAlignment = VerticalAlignment.Center;
             label.Name = name;
             label.Content = txt+":";
             label.Margin = new Thickness(2,2,30,2);

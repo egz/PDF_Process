@@ -28,9 +28,10 @@ namespace PDF_Process
 
         private void InitializeMainWindow()
         {
-           
-            this.Content = new PagePanel();
-          
+
+            //this.Content = new PagePanel();
+            this.Content = new PagePanel_New();
+
         }
     }
 }

@@ -67,29 +67,7 @@ namespace PDF_Process
         }
 
         //  public override Size PageSize { set => throw new NotImplementedException(); }
-        public void test()
-        {
-            var dlg = new PrintDialog();
-
-            // Allow the user to select a PageRange
-            dlg.UserPageRangeEnabled = true;
-
-            if (dlg.ShowDialog() == true)
-            {
-                //DocumentPaginator paginator =
-                //  _fixedDocument.DocumentPaginator;
-
-                if (dlg.PageRangeSelection == PageRangeSelection.UserPages)
-                {
-                    var c = 10;
-                    //paginator = new PageRangeDocumentPaginator(
-                    //                 _fixedDocument.DocumentPaginator,
-                    //                 dlg.PageRange);
-                }
-
-         //       dlg.PrintDocument(paginator, "Yes, it works");
-            }
-        }
+    
     }
 
 

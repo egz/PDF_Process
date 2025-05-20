@@ -44,24 +44,7 @@ namespace PDF_Process
         #endregion 屬性
 
         #region 初始
-        //public PDFProcess(string originFile,string outFile,string pages)
-        //{
-        //    OriginFilePath = originFile;
-        //    OutFilePath = outFile;
-        //    PageRang = pages;
-
-        //    // 測試 //
-        //    //PageRang = "1,2,3,10-20,7-8,9,10,11-12";
-        //    //OriginFilePath = @"d:\test.pdf";
-        //    //OutFilePath = @"d:\test1.pdf";
-        //    var tasks = new Task[3];
-        //    Task taskA = Task.Run(() => PdfCopyTo(OriginFilePath, OutFilePath, GetPages(PageRang)));
-        //    //      PdfCopyTo(originfile, outfile, GetPages(str));
-        //    tasks[0] = taskA;
-        //    Task.WaitAll(tasks);
-
-        //}
-
+      
 
         public PDFProcess(Dictionary<string,object>datas)
         {
