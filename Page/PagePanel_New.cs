@@ -293,10 +293,12 @@ namespace PDF_Process
                     for(int i = 0; i < dirCount; i++)
                     {
                         ItemData_New Pillar = (DataPanel.Children[i] as ItemData_New);
-                        Pillar.DataCheckBox.IsChecked = true;
+                        
                         Pillar.PillarName.Text = textData[i].HID;
                         Pillar.PillarData.Text = textData[i].Pages;
-                   
+                        Pillar.DataCheckBox.IsChecked = textData[i].Pages != string.Empty;
+                        //Pillar.DataCheckBox.IsChecked = true  ;
+
                     }
              
                 }

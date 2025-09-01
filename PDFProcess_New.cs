@@ -66,9 +66,9 @@ namespace PDF_Process
                     {
                         string outfile = pillar.Key + "\\"+name + ".pdf";
                         PdfDocument pdfDoc = new PdfDocument(new PdfWriter(outfile));
-                        List<int> pages = GetPages(pillar.Value, offset);
-
-                        srcDoc.CopyPagesTo(pages, pdfDoc);
+                        List<int> pages = GetPages(pillar.Value.TrimEnd(','), offset);
+                        if (pages.Count == 0) continue;
+                         srcDoc.CopyPagesTo(pages, pdfDoc);
                         pdfDoc.Close();
                     }
                     
