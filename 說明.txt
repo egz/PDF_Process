@@ -1,3 +1,28 @@
+﻿PDF_Process 使用與維護說明
+
+用途
+將一份或多份來源 PDF 的指定頁面，依柱位分開輸出。每份來源可設定自己的頁碼偏移。
+
+操作方式
+1. 輸入「文件數」並按該列的 Enter，選擇來源 PDF，填入用於輸出檔名的來源名稱與頁碼偏移。
+2. 輸入「柱位數」並按該列的 Enter，再填寫柱位名稱與頁碼。也可按 Load 匯入 TXT。
+3. 選擇輸出根資料夾，確認來源與柱位的勾選狀態，再按右下方的 Enter。
+4. 查看結果視窗內各檔案的輸出路徑與訊息。例如柱位 HID1、來源名稱 Rail 會輸出到 HID1\HID1_Rail.pdf。
+
+TXT 格式與頁碼
+每行使用「柱位:頁碼」，例如 HID1:1,3-5。空白行會略過，冒號數量錯誤時顯示行號。可用 HID2: 匯入尚未填頁碼的柱位。
+頁碼從 1 開始，逗號分隔單頁或區間，區間包含起訖頁。若來源偏移為 2，輸入 1,3-5 會取來源 PDF 的第 3、5、6、7 頁。
+現行規則在頁碼文字解析失敗時會嘗試輸出第 1 頁，並在結果視窗顯示原因。
+
+程式入口與資料流
+App.xaml 啟動 MainWindow，主視窗載入 Page/PagePanel_New.cs。
+TXT 由 Model/PillarSettingsParser.cs 解析成 TextDataModel，再填入畫面的柱位列。
+匯出時，畫面收集來源與柱位設定，交由 PdfExportService.cs 使用 iText 處理，再顯示逐檔結果。
+UserControl 存放路徑、數量、柱位等控制項。InitializedObject 與 Extension 提供共用的控制項建立及 Grid 排版方法。
+PdfTest.cs、UserControl/PageRangeDocumentPaginator.cs 與 MCSPdfSplitter .cs 是保留的工具，目前未接到主畫面。
+
+以下是早期開發紀錄
+
 1.使用itext7
 
 

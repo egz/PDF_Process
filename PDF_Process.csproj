@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- 主介面使用 WPF，輸出資料夾選擇器使用 Windows Forms。 -->
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
@@ -7,6 +8,7 @@
 	  <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
+  <!-- iText 讀取來源 PDF，並將指定頁面複製到新的 PDF。 -->
   <ItemGroup>
     <PackageReference Include="itext7" Version="7.2.1" />
   </ItemGroup>

@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace PDF_Process
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// 處理主視窗的初始化與內容載入。
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -26,6 +26,7 @@ namespace PDF_Process
             InitializeMainWindow();
         }
 
+        // 主視窗負責載入操作面板，匯入與匯出事件由面板處理。
         private void InitializeMainWindow()
         {
 

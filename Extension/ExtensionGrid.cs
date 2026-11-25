@@ -4,6 +4,7 @@ using System.Windows.Controls;
 
 namespace PDF_Process
 {
+    // 提供 Grid 欄列配置與控制項放置的共用方法。
     public static class ExtensionGrid
     {
         /// <summary> Grid行列數設定。 </summary>
@@ -12,6 +13,7 @@ namespace PDF_Process
         /// <param name="column"> 列數 </param>
         public static void SetDefinition(this Grid grid, int row = 0, int column = 0)
         {
+            // 只重建有指定正數的維度。傳入 0 時保留原有定義。
             if (row > 0)
             {
                 grid.RowDefinitions.Clear();
@@ -40,6 +42,7 @@ namespace PDF_Process
         public static void SetPosition(this Grid grid, UIElement obj, int row, int column)
         {
             if (row < 0 || column < 0) throw new Exception("Error:Row or Column < 0 !");
+            // 先設定附加屬性，再把控制項加入 Grid。
             Grid.SetRow(obj, row);
             Grid.SetColumn(obj, column);
             grid.Children.Add(obj);

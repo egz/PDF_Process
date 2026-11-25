@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -11,6 +10,7 @@ using System.Windows.Media;
 
 namespace PDF_Process
 {
+    // PDF 操作面板，管理來源列、柱位列、設定匯入與結果顯示。
     public class PagePanel_New : UserControl
     {
         #region 屬性
@@ -122,6 +122,7 @@ namespace PDF_Process
         }
 
 
+        // 上方放來源與柱位清單，下方放輸出位置及操作按鈕。
         private void InitializeBaseGrid()
         {
             BaseGrid = new Grid();
@@ -171,7 +172,7 @@ namespace PDF_Process
 
         }
 
-        /// <summary> DPF Path </summary>
+        /// <summary> 初始化 PDF 輸出根資料夾選擇器。 </summary>
         /// 
         private void InitializeSaveRootFolderPanel()
         {
@@ -202,16 +203,16 @@ namespace PDF_Process
 
         #region 函式
 
-        /// <summary> 變更Bay數量 </summary>
+        /// <summary> 依輸入的柱位數調整清單列數。 </summary>
         /// 
         private void UpdateBayNumber()
         {
             int docCount = DataPanel.Children.Count - 1;
             int dataMumber = Convert.ToInt32(DataMumber.NumberText.Text);
-            // 目前-未來
+            // 計算目標列數與目前列數的差額。
             int count = dataMumber - docCount;
 
-            //update
+            // 差額為零時保留目前的清單。
             if (count == 0) return;
             UpdatePanelData(DataPanel, count);
         }
@@ -219,13 +220,14 @@ namespace PDF_Process
         #endregion 函式
 
         /// <summary>
-        /// 更新Panel資料
+        /// 依指定的列數差額更新清單。
         /// </summary>
         /// <param name="panel"></param>
         /// <param name="count"></param>
+        // 兩種清單的最後一個子項都是數量控制列，增減時保留該列。
         private void UpdatePanelData(StackPanel panel, int count)
         {
-            //add
+            // 增加清單列。
             if (count > 0)
             {
                 for (int i = count; i >= 1; i--)
@@ -237,15 +239,11 @@ namespace PDF_Process
 
                 }
             }
-            // del
+            // 從清單末端移除多出的列。
             else if (count < 0)
             {
-               
-                int docCount = DataPanel.Children.Count - 1;
-                // count數-1=最後index，然後再去掉要減掉的數量，就是從哪邊減
-                int index = Math.Abs(docCount  + count - 1);
-                panel.Children.RemoveRange(index, Math.Abs(count));
-
+                int itemCount = panel.Children.Count - 1;
+                panel.Children.RemoveRange(itemCount + count, -count);
             }
         }
 
@@ -254,105 +252,134 @@ namespace PDF_Process
 
         #region 事件
 
-        /// <summary> 抓取txt檔填柱名和頁數 </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        // 先完成整份 TXT 的解析，再用有效資料更新柱位列。
         private void ButtonLoadSetting_Click(object sender, RoutedEventArgs e)
         {
-            // 載入寫好的txt檔
-            OpenFileDialog openFileDialog = new OpenFileDialog
+            var dialog = new OpenFileDialog
             {
                 Title = "選擇文字檔",
-                Filter = "文字檔 (*.txt)|*.txt",   // 限定副檔名為 .txt
+                Filter = "文字檔 (*.txt)|*.txt",
                 Multiselect = false
             };
 
-            if (openFileDialog.ShowDialog() == true)
-            {
-                // 讀檔抓取，待完成
-                string filePath = openFileDialog.FileName;
-                try
-                {
-                    string[] lines = File.ReadAllLines(filePath);
-                    if (lines.Length == 0) return;
-                    List<TextDataModel> textData = new();
-                    foreach (var line in lines)
-                    {
-                        var data = line.Trim();
-                        if (string.IsNullOrEmpty(data) || !data.Contains(":")) continue;
-                        string[] splitData = data.Split(':');
-                        if (splitData.Length==2)
-                        {
-                            textData.Add(new TextDataModel(splitData[0].Trim(), splitData[1].Trim()));
-                        }
-                        
-                    }
-                    DataMumber.NumberText.Text= textData.Count.ToString();
-                    UpdateBayNumber();
-                    int dirCount = DataPanel.Children.Count - 1;
-                    for(int i = 0; i < dirCount; i++)
-                    {
-                        ItemData_New Pillar = (DataPanel.Children[i] as ItemData_New);
-                        
-                        Pillar.PillarName.Text = textData[i].HID;
-                        Pillar.PillarData.Text = textData[i].Pages;
-                        Pillar.DataCheckBox.IsChecked = textData[i].Pages != string.Empty;
-                        //Pillar.DataCheckBox.IsChecked = true  ;
+            if (dialog.ShowDialog() != true)
+                return;
 
-                    }
-             
-                }
-                catch (Exception ex)
+            try
+            {
+                var entries = PillarSettingsParser.Parse(
+                    File.ReadLines(dialog.FileName), out var invalidLines);
+
+                if (entries.Count > 0)
                 {
-                    MessageBox.Show(ex.Message);
-                    // var filename = openFileDialog.SafeFileName;
+                    DataMumber.NumberText.Text = entries.Count.ToString();
+                    UpdateBayNumber();
+                    for (int i = 0; i < entries.Count; i++)
+                    {
+                        var pillar = (ItemData_New)DataPanel.Children[i];
+                        pillar.PillarName.Text = entries[i].HID;
+                        pillar.PillarData.Text = entries[i].Pages;
+                        // 空白頁碼仍可顯示柱位，但預設略過匯出。
+                        pillar.DataCheckBox.IsChecked = entries[i].Pages != string.Empty;
+                    }
                 }
+
+                if (invalidLines.Count > 0)
+                {
+                    MessageBox.Show($"已略過格式錯誤的行：{string.Join("、", invalidLines)}。每行請使用 HID:頁碼。");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"無法匯入設定：{ex.Message}");
             }
         }
 
-        /// <summary> 進入PDF處理(儲存) </summary>
-        /// 
-        private void ButtonEnter_Click(object sender, RoutedEventArgs e)
+        // 先取得本次選取資料，再交給背景服務處理，避免重複啟動匯出。
+        private async void ButtonEnter_Click(object sender, RoutedEventArgs e)
         {
+            ButtonEnter.IsEnabled = false;
             Cursor = Cursors.Wait;
-            // 1.先抓root資料夾
-           
-            Dictionary<string, List<string>> originData = new Dictionary<string, List<string>>();
-            Dictionary<string, List<string>> numberData = new Dictionary<string, List<string>>();
-            //Dictionary<string, string> numberData = new Dictionary<string, string>();
-            int originCount = OriginPanel.Children.Count - 1;
-          
-            // 來源圖、[檔名、offset]
-            for (int i = 0; i < originCount; i++)
-            {
-                FilePathPanel fileData = OriginPanel.Children[i] as FilePathPanel;
-                if (fileData.DataCheckBox.IsChecked == false) continue;
-                originData.Add(fileData.NameText.Text, new List<string>() { fileData.FileText.Text, fileData.Offset.Text });
-            }
 
-            // 2.抓 PillarName子資料夾 沒有->創，有->跳過
-            // 去掉最後一個number item
-            // 目的資料夾、頁數
-
-            string savePath = SaveRootFolder.FileText.Text + "\\";
-            int dirCount = DataPanel.Children.Count - 1;
-            for (int i = 0; i < dirCount; i++)
+            try
             {
-                ItemData_New Pillar = (DataPanel.Children[i] as ItemData_New);
-                if (Pillar.DataCheckBox.IsChecked != true) continue;
-                //string name = savePath.Replace(".pdf", "") + "\\" + Pillar.PillarName.Text;
-                string name = savePath  + Pillar.PillarName.Text;
-                numberData.Add(name,new List<string>() { Pillar.PillarName.Text, Pillar.PillarData.Text });
-                if (!Directory.Exists(name))
+                var sources = new List<PdfSource>();
+                for (int i = 0; i < OriginPanel.Children.Count - 1; i++)
                 {
-                    // creat Dir
-                    Directory.CreateDirectory(name);
+                    var file = (FilePathPanel)OriginPanel.Children[i];
+                    if (file.DataCheckBox.IsChecked == false)
+                        continue;
+
+                    sources.Add(new PdfSource(file.NameText.Text, file.FileText.Text, file.Offset.Text));
                 }
+
+                var targets = new List<PdfExportTarget>();
+                string saveRoot = SaveRootFolder.FileText.Text;
+                for (int i = 0; i < DataPanel.Children.Count - 1; i++)
+                {
+                    var pillar = (ItemData_New)DataPanel.Children[i];
+                    if (pillar.DataCheckBox.IsChecked != true)
+                        continue;
+
+                    targets.Add(new PdfExportTarget(pillar.PillarName.Text, pillar.PillarData.Text));
+                }
+
+                // 服務接收一般資料物件，背景工作不讀取 WPF 控制項。
+                var results = await PdfExportService.ExportAsync(saveRoot, sources, targets);
+                Cursor = null;
+                ShowExportResults(results);
+            }
+            catch (Exception ex)
+            {
+                Cursor = null;
+                MessageBox.Show($"無法完成匯出：{ex.Message}");
+            }
+            finally
+            {
+                Cursor = null;
+                ButtonEnter.IsEnabled = true;
+            }
+        }
+
+        // 逐檔顯示輸出位置及詳細原因，結果較多時可捲動查閱。
+        private void ShowExportResults(IReadOnlyList<PdfExportResult> results)
+        {
+            if (results.Count == 0)
+            {
+                MessageBox.Show("請至少選取一份來源 PDF 和一個柱位。");
+                return;
             }
 
-            new PDFProcess_New(originData, numberData);
-            Cursor = null;
-            MessageBox.Show("完成");
+            int exported = 0;
+            var details = new System.Text.StringBuilder();
+            foreach (var result in results)
+            {
+                if (result.Exported)
+                    exported++;
+
+                details.AppendLine($"{(result.Exported ? "已匯出" : "未匯出")}  {result.FilePath}");
+                if (result.Detail != null)
+                    details.AppendLine(result.Detail);
+            }
+
+            var output = new TextBox
+            {
+                Text = details.ToString(),
+                IsReadOnly = true,
+                TextWrapping = TextWrapping.Wrap,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Margin = new Thickness(12)
+            };
+            var dialog = new Window
+            {
+                Title = $"PDF 匯出結果（成功 {exported}／共 {results.Count}）",
+                Owner = Window.GetWindow(this),
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Width = 720,
+                Height = 420,
+                Content = output
+            };
+            dialog.ShowDialog();
         }
 
         /// <summary> PDF來源文件數變更 </summary>
@@ -363,9 +390,9 @@ namespace PDF_Process
         {
             int docCount = OriginPanel.Children.Count - 1;
             int docMumber = Convert.ToInt32(FolderNumber.NumberText.Text);
-            // 目前-未來
+            // 計算目標列數與目前列數的差額。
             int count = docMumber - docCount;
-            //update
+            // 差額為零時保留目前的清單。
             if (count == 0) return;
             UpdatePanelData(OriginPanel, count);
         }

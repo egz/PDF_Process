@@ -12,6 +12,7 @@ using System.Windows.Controls;
 namespace PDF_Process
 {
 
+    // 同一個控制項可作為來源 PDF 列，或作為輸出根資料夾選擇器。
     public class FilePathPanel : StackPanel
     {
         #region 屬性
@@ -55,6 +56,7 @@ namespace PDF_Process
         #endregion 屬性
 
         #region 初始
+        // isBrowser 決定瀏覽按鈕使用檔案還是資料夾對話框。
         public FilePathPanel(string name, Visibility isVisible = Visibility.Visible, bool isBrowser = false)
         {
             DataCheckBox = DefaultItem.CreateCheckBox("ItemAllow");

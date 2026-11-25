@@ -8,6 +8,7 @@ using System.Windows.Controls;
 
 namespace PDF_Process
 {
+  // 建立操作面板共用的文字框、勾選框與按鈕，集中管理預設外觀。
   public  class DefaultItem
     {
         public static double DefaultFontSize

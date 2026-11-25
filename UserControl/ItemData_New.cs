@@ -5,6 +5,7 @@ using System.Windows.Controls;
 
 namespace PDF_Process
 {
+    // 一列柱位設定，包含是否匯出、柱位名稱及頁碼文字。
     public class ItemData_New :UserControl
     {
         #region 屬性

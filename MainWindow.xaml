@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:PDF_Process"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <!-- 程式啟動後由 MainWindow.xaml.cs 將視窗內容設為 PDF 操作面板。 -->
     <Grid>
 
     </Grid>

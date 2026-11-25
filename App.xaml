@@ -1,8 +1,10 @@
-﻿<Application x:Class="PDF_Process.App"
+﻿<!-- WPF 啟動入口。StartupUri 指定應用程式開啟時載入的主視窗。 -->
+<Application x:Class="PDF_Process.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:PDF_Process"
              StartupUri="MainWindow.xaml">
+    <!-- 放在這裡的共用資源可由應用程式內各視窗取用。 -->
     <Application.Resources>
          
     </Application.Resources>

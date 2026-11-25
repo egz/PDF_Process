@@ -6,6 +6,7 @@ using System.Windows.Input;
 
 namespace PDF_Process
 {
+   // 共用的數量輸入列。按加減只更新數字，外層面板收到 Enter 才調整列數。
    public class MumberUpDown: StackPanel
     {
         #region 屬性
@@ -128,6 +129,7 @@ namespace PDF_Process
 
         #region 事件
 
+        // 放行數字鍵與常用的游標、刪除及焦點切換按鍵。
         private void TextBox_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             bool isNumber= 

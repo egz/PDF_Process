@@ -9,8 +9,9 @@ using System.Windows;
 namespace PDF_Process
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// 處理 App.xaml 對應的應用程式事件。
     /// </summary>
+    // App.xaml 的程式碼後置類別，承接 WPF 應用程式生命週期。
     public partial class App : Application
     {
     }

@@ -6,13 +6,14 @@ namespace PDF_Process
 {
     /// 
 
-    /// Encapsulates a DocumentPaginator and allows
-    /// to paginate just some specific pages (a "PageRange")
-    /// of the encapsulated DocumentPaginator
+    /// 包裝既有的 DocumentPaginator，
+    /// 以 PageRange 指定要取用的頁面，
+    /// 並依所選範圍提供分頁。
     ///  (c) Thomas Claudius Huber 2010 
     ///      http://www.thomasclaudiushuber.com
     /// 
 
+    // 保留的 WPF 列印分頁工具。主畫面的 PDF 匯出流程目前未呼叫此類別。
     public class PageRangeDocumentPaginator : DocumentPaginator
     {
 
@@ -23,17 +24,18 @@ namespace PDF_Process
           DocumentPaginator paginator,
           PageRange pageRange)
         {
+            // 列印對話框的頁次從 1 開始，DocumentPaginator 索引從 0 開始。
             _startIndex = pageRange.PageFrom - 1;
             _endIndex = pageRange.PageTo - 1;
             _paginator = paginator;
 
-            // Adjust the _endIndex
+            // 結束索引最多只能到原始文件的最後一頁。
             _endIndex = Math.Min(_endIndex, _paginator.PageCount - 1);
         }
         public override DocumentPage GetPage(int pageNumber)
         {
-            // Just return the page from the original
-            // paginator by using the "startIndex"
+            // 將所選範圍的頁次加上起始索引，
+            // 再向原始分頁器取得對應頁面。
             return _paginator.GetPage(pageNumber + _startIndex);
         }
 
@@ -77,7 +79,7 @@ namespace PDF_Process
     //{
     //    var dlg = new PrintDialog();
 
-    //    // Allow the user to select a PageRange
+    //    // 允許使用者選取列印頁碼範圍。
     //    dlg.UserPageRangeEnabled = true;
 
     //    if (dlg.ShowDialog() == true)

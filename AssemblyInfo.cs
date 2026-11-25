@@ -1,10 +1,11 @@
 using System.Windows;
 
+// 設定 WPF 主題資源字典的位置。預設字典由本組件提供。
 [assembly: ThemeInfo(
-    ResourceDictionaryLocation.None, //where theme specific resource dictionaries are located
-                                     //(used if a resource is not found in the page,
-                                     // or application resource dictionaries)
-    ResourceDictionaryLocation.SourceAssembly //where the generic resource dictionary is located
-                                              //(used if a resource is not found in the page,
-                                              // app, or any theme specific resource dictionaries)
+    ResourceDictionaryLocation.None, // 主題專用資源字典的位置。
+                                     // 找不到前一層的資源時使用，
+                                     // 例如頁面或應用程式的資源字典。
+    ResourceDictionaryLocation.SourceAssembly // 通用資源字典的位置。
+                                              // 找不到前一層的資源時使用，
+                                              // 例如頁面、應用程式或主題專用資源字典。
 )]
