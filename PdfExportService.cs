@@ -13,35 +13,101 @@ namespace PDF_Process
     // 執行 PDF I/O 並回傳結果，由呼叫端決定如何顯示。
     internal static class PdfExportService
     {
+        // 兩個數字分別限制每組來源數和每輪柱位數，勾選更多項目時會自動分批。
+        private const int SourcesPerGroup = 5;
+        private const int TargetsPerRound = 10;
+
         public static async Task<IReadOnlyList<PdfExportResult>> ExportAsync(
             string outputRoot, IReadOnlyList<PdfSource> sources, IReadOnlyList<PdfExportTarget> targets)
         {
             var plan = PdfOutputPlan.Create(outputRoot, sources, targets);
+            var results = new List<PdfExportResult>();
 
-            // 不同來源各自處理。同一份來源 PDF 只開啟一次，依序匯出各柱位。
-            var batches = await Task.WhenAll(plan.Select(batch =>
-                Task.Run(() => ExportSource(batch)))).ConfigureAwait(false);
+            // 等前一組完成匯出並關閉來源後，才開啟下一組。
+            // 例如 6 份來源、8 個柱位會分成 5 份及 1 份兩組，各跑一輪。
+            for (int index = 0; index < plan.Count; index += SourcesPerGroup)
+            {
+                var group = plan.Skip(index).Take(SourcesPerGroup).ToArray();
+                var groupResults = await Task.Run(() => ExportGroupAsync(group)).ConfigureAwait(false);
+                results.AddRange(groupResults);
+            }
 
-            return batches.SelectMany(batch => batch).ToArray();
+            return results;
         }
 
-        private static IReadOnlyList<PdfExportResult> ExportSource(PdfExportBatch batch)
+        private static async Task<IReadOnlyList<PdfExportResult>> ExportGroupAsync(PdfExportBatch[] group)
         {
-            PdfSource source = batch.Source;
-            PdfDocument document;
+            var documents = new PdfDocument[group.Length];
+            var results = group.Select(_ => new List<PdfExportResult>()).ToArray();
             try
             {
-                document = new PdfDocument(new PdfReader(source.FilePath));
+                // 每份來源只開啟一次。讀取失敗時記錄該來源對應的逐檔結果，其餘來源照常處理。
+                for (int index = 0; index < group.Length; index++)
+                {
+                    var batch = group[index];
+                    try
+                    {
+                        documents[index] = new PdfDocument(new PdfReader(batch.Source.FilePath));
+                    }
+                    catch (Exception ex)
+                    {
+                        results[index].AddRange(batch.Files.Select(file => new PdfExportResult(
+                            file.FilePath, false, $"無法讀取來源 PDF「{batch.Source.FilePath}」：{ex.Message}")));
+                    }
+                }
+
+                // 等本輪所有來源處理完畢才進入下一輪。同一組來源在各輪共用已開啟的 PDF。
+                // 例如 3 份來源、11 個柱位會在同一組先處理 10 個，再處理剩下的 1 個。
+                int targetCount = group[0].Files.Count;
+                for (int start = 0; start < targetCount; start += TargetsPerRound)
+                {
+                    int end = Math.Min(start + TargetsPerRound, targetCount);
+                    var round = new List<Task>();
+                    for (int index = 0; index < group.Length; index++)
+                    {
+                        var document = documents[index];
+                        if (document == null)
+                            continue;
+
+                        var batch = group[index];
+                        var sourceResults = results[index];
+                        int first = start;
+                        // 不同來源可並行。同一份 PDF 依序處理本輪柱位，同時只寫一份輸出。
+                        round.Add(Task.Run(() =>
+                        {
+                            for (int target = first; target < end; target++)
+                                sourceResults.Add(ExportFile(document, batch.Source.Offset, batch.Files[target]));
+                        }));
+                    }
+
+                    await Task.WhenAll(round).ConfigureAwait(false);
+                }
+            }
+            finally
+            {
+                // 所有柱位輪次結束後才關閉本組來源，發生例外時也會執行。
+                for (int index = 0; index < documents.Length; index++)
+                    CloseSource(documents[index], group[index].Source, results[index]);
+            }
+
+            return results.SelectMany(sourceResults => sourceResults).ToArray();
+        }
+
+        private static void CloseSource(PdfDocument document, PdfSource source, List<PdfExportResult> results)
+        {
+            try
+            {
+                document?.Close();
             }
             catch (Exception ex)
             {
-                return batch.Files.Select(file => new PdfExportResult(
-                    file.FilePath, false, $"無法讀取來源 PDF「{source.FilePath}」：{ex.Message}")).ToArray();
-            }
-
-            using (document)
-            {
-                return batch.Files.Select(file => ExportFile(document, source.Offset, file)).ToArray();
+                // 關閉來源失敗時保留已匯出的結果，並附加警告。
+                if (results.Count > 0)
+                {
+                    var first = results[0];
+                    string warning = $"無法關閉來源 PDF「{source.FilePath}」：{ex.Message}";
+                    results[0] = first with { Detail = first.Detail == null ? warning : first.Detail + Environment.NewLine + warning };
+                }
             }
         }
 
