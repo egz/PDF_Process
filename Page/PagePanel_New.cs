@@ -318,7 +318,8 @@ namespace PDF_Process
             // 1.先抓root資料夾
            
             Dictionary<string, List<string>> originData = new Dictionary<string, List<string>>();
-            Dictionary<string, string> numberData = new Dictionary<string, string>();
+            Dictionary<string, List<string>> numberData = new Dictionary<string, List<string>>();
+            //Dictionary<string, string> numberData = new Dictionary<string, string>();
             int originCount = OriginPanel.Children.Count - 1;
           
             // 來源圖、[檔名、offset]
@@ -341,7 +342,7 @@ namespace PDF_Process
                 if (Pillar.DataCheckBox.IsChecked != true) continue;
                 //string name = savePath.Replace(".pdf", "") + "\\" + Pillar.PillarName.Text;
                 string name = savePath  + Pillar.PillarName.Text;
-                numberData.Add(name, Pillar.PillarData.Text);
+                numberData.Add(name,new List<string>() { Pillar.PillarName.Text, Pillar.PillarData.Text });
                 if (!Directory.Exists(name))
                 {
                     // creat Dir

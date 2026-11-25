@@ -1,13 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.IO;
 using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Canvas.Parser;
-using iText.Kernel.Pdf.Canvas.Parser.Listener;
-using iText.Kernel.Utils;
-using System.Printing;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -46,7 +40,7 @@ namespace PDF_Process
 
         #region 初始
 
-        public PDFProcess_New(Dictionary<string, List<string>> datas, Dictionary<string, string> pillars)
+        public PDFProcess_New(Dictionary<string, List<string>> datas, Dictionary<string, List<string>> pillars)
         {
              var tasks = new List<Task>();
             // datas  來源圖、[檔名、offset]
@@ -62,11 +56,13 @@ namespace PDF_Process
                     PdfDocument srcDoc = new PdfDocument(new PdfReader(origin));
                     try {
                 
-                    foreach (KeyValuePair<string, string> pillar in pillars)
+                    foreach (KeyValuePair<string, List<string>> pillar in pillars)
                     {
-                        string outfile = pillar.Key + "\\"+name + ".pdf";
+                        // 新檔名：DIR/DIR_NAME=>例：HID1/HID1_Rail.pdf
+                        string outfile=string.Format("{0}\\{1}_{2}.pdf", pillar.Key, pillar.Value[0], name);
+                           // string outfile = pillar.Key + "\\"+name + ".pdf";
                         PdfDocument pdfDoc = new PdfDocument(new PdfWriter(outfile));
-                        List<int> pages = GetPages(pillar.Value.TrimEnd(','), offset);
+                        List<int> pages = GetPages(pillar.Value[1].TrimEnd(','), offset);
                         if (pages.Count == 0) continue;
                          srcDoc.CopyPagesTo(pages, pdfDoc);
                         pdfDoc.Close();
